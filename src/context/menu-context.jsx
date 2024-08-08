@@ -8,6 +8,7 @@ const getDefaultCart = () => {
   for(let i = 0; i < 31;i++) {
     cart[i] = 0;
   }
+  console.log('cart reset')
   return cart
 }
 
@@ -35,13 +36,14 @@ export function MenuContextProvider(props) {
     setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
   };
 
-  useEffect(() => {
-    const getMenu = async () => {
-      const allDocs = await getDocs(menuRef)
-      const unsortedMenu = allDocs.docs.map((doc) => ({ ...doc.data(), id: doc.id}))
-      setMenuData(unsortedMenu.sort((a,b) => a.id - b.id ))
+  const getMenu = async () => {
+    const allDocs = await getDocs(menuRef)
+    const unsortedMenu = allDocs.docs.map((doc) => ({ ...doc.data(), id: doc.id}))
+    setMenuData(unsortedMenu.sort((a,b) => a.id - b.id ))
 
-  }
+}
+  useEffect(() => {
+
   getMenu()
   
   }, [])
@@ -57,7 +59,8 @@ export function MenuContextProvider(props) {
     updateCart,
     cartItemCount,
     noteRender,
-    setNoteRender
+    setNoteRender,
+    getMenu
     
   }
   return (

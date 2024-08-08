@@ -3,7 +3,7 @@ import { orderContext } from "./exportContext";
 import { menuContext } from "./exportContext";
 import ordersound from '../assets/ordersound.mp3';
 
-import db from "../firebase-config,js";
+import {db} from "../firebase-config,js";
 import { setDoc, deleteDoc, onSnapshot } from "firebase/firestore";
 import {collection, getDocs, updateDoc, doc} from 'firebase/firestore';
 

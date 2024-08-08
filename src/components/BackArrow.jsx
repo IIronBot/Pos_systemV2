@@ -8,7 +8,7 @@ export function BackArrow(prop) {
   const location = prop.data
   return (
     <div>
-      <Link to={`/${location}`}><ArrowLeft className = 'backArrow' /></Link>
+      <Link to={`/${location}`}><ArrowLeft className = 'absolute top-1.5 h-10 w-10 m-3' /></Link>
 
     </div>
   )

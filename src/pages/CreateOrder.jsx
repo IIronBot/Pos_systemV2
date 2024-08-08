@@ -1,4 +1,5 @@
 import React from 'react';
+import '../index.css'
 import { useCallback, useContext, useEffect, useState } from 'react'
 import { MenuItem } from '../components/MenuItem';
 import { menuContext } from '../context/exportContext';
@@ -9,11 +10,12 @@ import { NoteEditor } from '../components/NoteEditor';
 
 export const CreateOrder = () => {
   const {buildOrderData, postOrder, orderNum, noteValue, setNoteValue} = useContext(orderContext)
-  const {menuData, cartItems, setNoteRender} = useContext(menuContext)
+  const {menuData, getMenu, cartItems, setNoteRender} = useContext(menuContext)
   const [filter, setFilter] = useState()
  
   let menuItemList = [];
   useEffect(() => {
+    // console.dir(getMenu())
     if(!menuData) return
     for(let i = 0; i < menuData.length; i++) {
       if(menuData[i]) {
@@ -31,7 +33,7 @@ const renderMenuItems = useCallback(() => {
     for(let i = 0; i < menuData.length; i++) {
       if(filter){
         if(menuData[i].category == filter){
-          menuItemList.push(cartItems && <MenuItem key ={i} data = {menuData[i]} /> )
+          menuItemList.push(cartItems && <MenuItem key = {i} data = {menuData[i]} /> )
         } 
       } else {
     menuItemList.push(<MenuItem key ={i} data = {menuData[i]} />)
@@ -51,24 +53,25 @@ useEffect(() => {
 
 
 
+const filterButtonStyle = 'mx-[10px] list-none shadow rounded border border-black bg-white text-black py-[8px] px-[10px] pointer max-h-[40px] text-sm hover:bg-[color:var(--secondary-color)] hover:scale-125 transition-all ease-in'
 
 const filterOptions = ['Wings', 'Quesadillas', 'Topping', 'Wraps', 'Specialties', 'Sandwiches']
   return (
-    <div className='createOrderPage'>
-      <h1>Create Order</h1>
+    <div className='bg-[var:color(--primary-color)] text-white h-fit'>
+      <h1 className = 'text-center py-[35px]'>Create Order</h1>
       <BackArrow data={'cashier'}/>
       <NoteEditor />
-      <ul className='filterOptions'>
+      <ul className='flex flex-wrap justify-center w-full pointer'>
         {filterOptions.map((item, index) => {
           return (
-            <li key ={index} className={item} ><button onClick={() => setFilter(item)}>{item}</button></li>
+            <li key ={index} className={filterButtonStyle} ><button onClick={() => setFilter(item)}>{item}</button></li>
           )
         })}
         {/* <li className='Wings' ><button onClick={() => getDefaultCart()}>getDefaultCart</button></li> */}
-        {/* <li ><button onClick={() => console.log(cartItems)}>cartItems</button></li> */}
-        <li ><button onClick={() => setFilter(undefined)}>All</button></li>
+        <li ><button onClick={() => console.log(cartItems)}>cartItems</button></li>
+        <li ><button className={filterButtonStyle} onClick={() => setFilter(undefined)}>All</button></li>
 
-        <li className='createOrderBtn' ><button onClick={() => {
+        <li className={filterButtonStyle} ><button onClick={() => {
 
           postOrder(buildOrderData(menuData, orderNum, noteValue))
           setNoteRender(false);
@@ -78,8 +81,10 @@ const filterOptions = ['Wings', 'Quesadillas', 'Topping', 'Wraps', 'Specialties'
           
           </li>
       </ul>
-      <div className='menuItemContainer'>
+      <div className='flex flex-wrap h-fit mt-[20px] mb-[50px] '>
        {menuData && renderMenuItems()}
+       <div>
+       </div>
       </div>
 
     </div>
