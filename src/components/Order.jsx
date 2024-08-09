@@ -24,16 +24,22 @@ export function Order(prop) {
       console.log("added: " + statusElement.classList[0]);
       statusElement.classList.replace("invisible", "visible");
       statusElement.classList.replace("opacity-0", "opacity-100");
+      statusElement.classList.replace("cursor-default", "cursor-pointer");
+
+      console.log(statusElement.classList);
     } else {
       console.log("not added");
       console.log(statusElement.className);
       statusElement.classList.replace("opacity-100", "opacity-0");
       statusElement.classList.replace("visible", "invisible");
+      statusElement.classList.replace("cursor-pointer", "cursor-default");
+      console.log(statusElement.classList);
     }
   };
 
   useEffect(() => {
     console.log("mounted");
+    console.log(localOrderData);
   }, []);
 
   // adds items totals
@@ -86,7 +92,11 @@ export function Order(prop) {
       {/* <div className='order'> */}
       <div className="w-1/3">
         <p className="my-[10px] text-center">Notes</p>
-        {localOrderData?.notes ? localOrderData?.notes : <p>__________</p>}
+        {localOrderData?.notes ? (
+          localOrderData?.notes
+        ) : (
+          <p className="flex justify-center items-center">__________</p>
+        )}
       </div>
       <div className="w-1/3">
         <p className="my-[10px] text-center">
@@ -126,12 +136,12 @@ export function Order(prop) {
         </p>
         <ul
           ref={statusRef}
-          className="opacity-0 transition-all ease relative bottom-[20px] h-0 list-none"
+          className="opacity-0 transition-all ease relative bottom-[20px] h-0 list-none cursor-default"
         >
           {statusOptions.map((item, index) => {
             return (
               <li
-                className="cursor-pointer my-[10px] z-10"
+                className="my-[10px] z-10"
                 key={index}
                 onClick={() => {
                   if (showStatusOptions) {

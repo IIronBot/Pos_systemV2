@@ -1,52 +1,48 @@
-import React, { useEffect, useState } from 'react'
-import { menuContext } from './exportContext';
+import React, { useEffect, useState } from "react";
+import { menuContext } from "./exportContext";
 import { db } from "../firebase-config,js";
-import {collection, getDocs} from 'firebase/firestore';
-
-const getDefaultCart = () => {
-  let cart = {}
-  for(let i = 0; i < 31;i++) {
-    cart[i] = 0;
-  }
-  console.log('cart reset')
-  return cart
-}
-
+import { collection, getDocs } from "firebase/firestore";
 
 export function MenuContextProvider(props) {
-  const [menuData, setMenuData] = useState(null)
-  const [cartItems, setCartItems] = useState(getDefaultCart())
-  const [cartItemCount, setCartItemCount] = useState()
-  const [noteRender, setNoteRender] = useState(false);
-  const menuRef = collection(db, 'Menu')
-
-  
-  function addToCart(itemId){
-    setCartItems((prev) => ({
-       ...prev, [itemId]: prev[itemId] + 1 }));
-    setCartItemCount(cartItems[itemId])
+  function getDefaultCart() {
+    let cart = {};
+    for (let i = 0; i < 31; i++) {
+      cart[i] = 0;
+    }
+    console.log("useless");
+    return cart;
   }
-  
-  function removeFromCart(itemId){
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-    setCartItemCount(cartItems[itemId])
 
+  const [menuData, setMenuData] = useState(null);
+  const [cartItems, setCartItems] = useState(() => getDefaultCart());
+  const [noteRender, setNoteRender] = useState(false);
+  const menuRef = collection(db, "Menu");
+
+  function addToCart(itemId) {
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: prev[itemId] + 1,
+    }));
+  }
+
+  function removeFromCart(itemId) {
+    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
   }
   const updateCart = (newAmount, itemId) => {
     setCartItems((prev) => ({ ...prev, [itemId]: newAmount }));
   };
 
   const getMenu = async () => {
-    const allDocs = await getDocs(menuRef)
-    const unsortedMenu = allDocs.docs.map((doc) => ({ ...doc.data(), id: doc.id}))
-    setMenuData(unsortedMenu.sort((a,b) => a.id - b.id ))
-
-}
+    const allDocs = await getDocs(menuRef);
+    const unsortedMenu = allDocs.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    setMenuData(unsortedMenu.sort((a, b) => a.id - b.id));
+  };
   useEffect(() => {
-
-  getMenu()
-  
-  }, [])
+    getMenu();
+  }, []);
 
   const contextvalue = {
     menuData,
@@ -57,15 +53,13 @@ export function MenuContextProvider(props) {
     removeFromCart,
     getDefaultCart,
     updateCart,
-    cartItemCount,
     noteRender,
     setNoteRender,
-    getMenu
-    
-  }
+    getMenu,
+  };
   return (
     <menuContext.Provider value={contextvalue}>
       {props.children}
     </menuContext.Provider>
-  )
+  );
 }

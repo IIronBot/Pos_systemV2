@@ -2,7 +2,6 @@ import React from "react";
 import { useContext, useEffect, useState } from "react";
 import { menuContext, orderContext } from "../context/exportContext";
 import { Order } from "./Order";
-import "./OrdersBlock.css";
 
 function OrdersBlock() {
   const [render, setRender] = useState(false);
