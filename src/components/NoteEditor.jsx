@@ -1,6 +1,6 @@
 import React from "react";
 import { useContext, useEffect, useRef } from "react";
-import { Note } from "phosphor-react";
+import { Note } from "@phosphor-icons/react";
 import { orderContext } from "../context/exportContext";
 import { menuContext } from "../context/exportContext";
 
