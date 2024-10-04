@@ -39,7 +39,6 @@ export function Order(prop) {
 
   useEffect(() => {
     console.log("mounted");
-    console.log(localOrderData);
   }, []);
 
   // adds items totals
