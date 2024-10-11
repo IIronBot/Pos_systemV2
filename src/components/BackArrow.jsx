@@ -8,7 +8,7 @@ export function BackArrow(prop) {
   return (
     <div>
       <Link to={`/${location}`}>
-        <ArrowLeft className="absolute top-1.5 h-10 w-10 m-3" />
+        <ArrowLeft className="text-white absolute left-[5%] top-[5%] h-10 w-10 m-3" />
       </Link>
     </div>
   );

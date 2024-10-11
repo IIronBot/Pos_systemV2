@@ -6,7 +6,7 @@ const firebaseConfig = {
   projectId: "pos-database-ffcb1",
   storageBucket: "pos-database-ffcb1.appspot.com",
   messagingSenderId: "520817305347",
-  appId: import.meta.env.VITE_APPID,
+  appId: import.meta.env.DEV.VITE_APPID,
   measurementId: "G-VR5NPQXCYN"
 };
 
