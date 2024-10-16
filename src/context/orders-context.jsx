@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { orderContext } from "./exportContext";
-import { menuContext } from "./exportContext";
+import React, { memo, useContext, useEffect, useState } from "react";
+import { orderContext, menuContext, loginContext } from "./exportContext";
 import ordersound from "../assets/ordersound.mp3";
 
 import { db } from "../firebase-config,js";
@@ -11,12 +10,12 @@ const playSound = () => {
   new Audio(ordersound).play();
 };
 
-export function OrderContextProvider(props) {
+export function OrderContextProvider({ user, setUser, children }) {
   const [orderNum, setOrderNum] = useState();
   const [isOrderLoading, setIsOrderLoading] = useState(false);
   const [noteValue, setNoteValue] = useState(null);
   const [status, setStatus] = useState("");
-  const ordersRef = collection(db, "Current Orders");
+  const ordersRef = collection(db, user.ordersCollectionId || "Menu");
 
   const { cartItems, setCartItems, getDefaultCart } = useContext(menuContext);
   const [orders, setOrders] = useState(null);
@@ -37,14 +36,17 @@ export function OrderContextProvider(props) {
   //listen for changes to data when context mounts
   useEffect(() => {
     // When you call onSnapshot, it returns an unsubscribe function that you can use to stop listening to changes.
+    if (!user) return;
     const unsubscribe = onSnapshot(
-      collection(db, "Current Orders"),
+      collection(db, user.ordersCollectionId || "orders"),
       (snapshot) => {
         const updatedOrders = snapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id,
         }));
-        setOrders(updatedOrders.sort((a, b) => a.ordernum - b.ordernum));
+        if (orders) {
+          setOrders(updatedOrders.sort((a, b) => a.ordernum - b.ordernum));
+        }
       }
     );
 
@@ -97,6 +99,7 @@ export function OrderContextProvider(props) {
     );
   };
 
+  useEffect(() => console.log("orders rendered"), []);
   const contextValue = {
     postOrder,
     orders,
@@ -116,7 +119,7 @@ export function OrderContextProvider(props) {
   };
   return (
     <orderContext.Provider value={contextValue}>
-      {props.children}
+      {children}
     </orderContext.Provider>
   );
 }

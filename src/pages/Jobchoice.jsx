@@ -1,9 +1,10 @@
 import { React, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { BackArrow } from "../components/BackArrow";
 import { loginContext } from "../context/exportContext";
 export function JobChoice() {
-  const { setUser } = useContext(loginContext);
+  const navigate = useNavigate();
+  const { user, setUser } = useContext(loginContext);
   const buttonStyle =
     "bg-transparent rounded-sm border-white border-2 h-20 w-52 cursor-pointer mx-10 hover:bg-[color:var(--secondary-color)] hover:text-black transition-all ease-in";
   return (
@@ -27,6 +28,8 @@ export function JobChoice() {
           Logout
         </button>
       </Link>
+      <button onClick={() => console.log(user.uid)}>some</button>
+      <button onClick={() => navigate("/createmenu")}>menu</button>
     </div>
   );
 }

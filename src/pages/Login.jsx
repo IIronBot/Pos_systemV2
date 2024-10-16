@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import React, { useContext, useEffect, useState } from "react";
 import { loginContext } from "../context/exportContext";
-
+import { makeId } from "../helper/makeId";
 export function Login() {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
@@ -22,8 +22,15 @@ export function Login() {
   function signIn(email, password) {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        setUser(userCredential.user);
-        console.log(user);
+        const userObject = userCredential.user;
+        const menuCollectionId = userObject.uid.slice(0, 16);
+        const ordersCollectionId = userObject.uid.slice(15, 30);
+        setUser({
+          ...userCredential.user,
+          menuCollectionId: menuCollectionId,
+          ordersCollectionId: ordersCollectionId,
+        });
+        navigate("/jobchoice");
       })
       .catch((error) => console.log(error));
   }
@@ -34,14 +41,22 @@ export function Login() {
     } else {
       setPasswordMatch(false);
     }
-    console.log(passwordMatch);
     if (!passwordMatch) {
       return;
     }
+    console.log("making account");
+
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed up
-        setUser(userCredential.user);
+        const userObject = userCredential.user;
+        const menuCollectionId = userObject.uid.slice(0, 16);
+        const ordersCollectionId = userObject.uid.slice(15, 30);
+        setUser({
+          ...userCredential.user,
+          menuCollectionId: menuCollectionId,
+          ordersCollectionId: ordersCollectionId,
+        });
+        navigate("/createmenu");
         console.log(user);
       })
       .catch((error) => console.log(error));
@@ -49,8 +64,9 @@ export function Login() {
   useEffect(() => {
     if (user?.email != null || user?.email != undefined) {
       navigate("/jobchoice");
+      console.log("logged in");
+      console.log(user);
     }
-    console.log(user?.email);
   }, [user]);
 
   const inputStyle = "bg-primary-color text-white w-2/3 my-4 px-2 py-1";
@@ -114,6 +130,9 @@ export function Login() {
             </button>
             {passwordMatch && <p>Passwords do not match try again</p>}
             <button onClick={() => console.log(user)}>action</button>
+            <button onClick={() => signIn("Test1@gmail.com", "password")}>
+              Skip
+            </button>
           </div>
         </div>
       </div>

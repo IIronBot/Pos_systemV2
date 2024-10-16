@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { menuContext } from "./exportContext";
+import React, { useEffect, useState, useContext, memo } from "react";
+import { menuContext, loginContext } from "./exportContext";
 import { db } from "../firebase-config,js";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 
-export function MenuContextProvider(props) {
+export function MenuContextProvider({ user, setUser, children }) {
   function getDefaultCart() {
     let cart = {};
     for (let i = 0; i < 31; i++) {
@@ -16,8 +16,18 @@ export function MenuContextProvider(props) {
   const [menuData, setMenuData] = useState(null);
   const [cartItems, setCartItems] = useState(() => getDefaultCart());
   const [noteRender, setNoteRender] = useState(false);
-  const menuRef = collection(db, "Menu");
 
+  const menuRef = collection(db, user.menuCollectionId || "Menu");
+
+  async function addMenuItem(id, name, category, price) {
+    await setDoc(doc(db, user.menuCollectionId, category), {
+      id: id,
+      name: name,
+      category: category,
+      price: price,
+    });
+    console.log("added");
+  }
   function addToCart(itemId) {
     setCartItems((prev) => ({
       ...prev,
@@ -41,6 +51,7 @@ export function MenuContextProvider(props) {
     setMenuData(unsortedMenu.sort((a, b) => a.id - b.id));
   };
   useEffect(() => {
+    console.log("menu rendered");
     getMenu();
   }, []);
 
@@ -56,10 +67,9 @@ export function MenuContextProvider(props) {
     noteRender,
     setNoteRender,
     getMenu,
+    addMenuItem,
   };
   return (
-    <menuContext.Provider value={contextvalue}>
-      {props.children}
-    </menuContext.Provider>
+    <menuContext.Provider value={contextvalue}>{children}</menuContext.Provider>
   );
 }

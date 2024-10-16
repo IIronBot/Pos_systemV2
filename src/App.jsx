@@ -1,5 +1,10 @@
-import React from "react";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { React, useState } from "react";
+import {
+  BrowserRouter,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
 import "./index.css";
 import { MenuContextProvider } from "./context/menu-context.jsx";
 import { OrderContextProvider } from "./context/orders-context";
@@ -10,26 +15,29 @@ import Cook from "./pages/Cook";
 import { CreateOrder } from "./pages/CreateOrder";
 import { JobChoice } from "./pages/Jobchoice";
 import { Login } from "./pages/Login.jsx";
+import { CreateMenu } from "./pages/CreateMenu.jsx";
 
-function App() {
+function App({ user, setUser }) {
+  console.log("app rerender");
   return (
     <>
-      <LoginContextProvider>
-        <MenuContextProvider>
-          <OrderContextProvider>
-            <Router>
+      <BrowserRouter>
+        <LoginContextProvider user={user} setUser={setUser}>
+          <MenuContextProvider user={user} setUser={setUser}>
+            <OrderContextProvider user={user} setUser={setUser}>
               <Routes>
-                <Route path="/" element={<Login />} />
-                <Route path="/jobchoice" element={<JobChoice />} />
+                <Route exact path="/" element={<Login />} />
+                <Route exact path="/jobchoice" element={<JobChoice />} />
                 <Route path="/cashier" element={<Cashier />} />
                 <Route path="/order" element={<CreateOrder />} />
                 <Route path="/cook" element={<Cook />} />
                 <Route path="/buser" element={<Buser />} />
+                <Route exact path="/createmenu" element={<CreateMenu />} />
               </Routes>
-            </Router>
-          </OrderContextProvider>
-        </MenuContextProvider>
-      </LoginContextProvider>
+            </OrderContextProvider>
+          </MenuContextProvider>
+        </LoginContextProvider>
+      </BrowserRouter>
     </>
   );
 }
