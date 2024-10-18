@@ -1,7 +1,14 @@
-import React, { useEffect, useState, useContext, memo } from "react";
+import React, { useEffect, useState, useContext, memo, useRef } from "react";
 import { menuContext, loginContext } from "./exportContext";
 import { db } from "../firebase-config,js";
-import { collection, getDocs, setDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  setDoc,
+  doc,
+  addDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
 export function MenuContextProvider({ user, setUser, children }) {
   function getDefaultCart() {
@@ -13,21 +20,46 @@ export function MenuContextProvider({ user, setUser, children }) {
     return cart;
   }
 
-  const [menuData, setMenuData] = useState(null);
+  const [menuData, setMenuData] = useState([]);
   const [cartItems, setCartItems] = useState(() => getDefaultCart());
   const [noteRender, setNoteRender] = useState(false);
 
-  const menuRef = collection(db, user.menuCollectionId || "Menu");
+  const menuRef = useRef(collection(db, user?.menuCollectionId || "Menu"));
+
+  // useEffect(() => {
+  //   console.log(menuRef);
+  //   console.log(menuRef.current);
+  // }, [user, menuRef]);
 
   async function addMenuItem(id, name, category, price) {
-    await setDoc(doc(db, user.menuCollectionId, category), {
+    const docName = id + category;
+    const docRef = doc(db, user?.menuCollectionId, docName);
+    await setDoc(docRef, {
       id: id,
       name: name,
       category: category,
       price: price,
     });
+    console.log("idez: " + id);
+
+    getMenu().then((data) => {
+      setMenuData([...data]);
+      console.log(menuData);
+    });
     console.log("added");
   }
+
+  const deleteMenuItem = async (id, category) => {
+    console.log(user?.menuCollectionId);
+    console.log("id: " + id);
+    console.log("cat: " + category);
+
+    await deleteDoc(doc(db, user?.menuCollectionId, id + category)).then(() =>
+      console.log("deleted")
+    );
+    setMenuData(menuData.filter((item) => item.id != id));
+  };
+
   function addToCart(itemId) {
     setCartItems((prev) => ({
       ...prev,
@@ -43,17 +75,21 @@ export function MenuContextProvider({ user, setUser, children }) {
   };
 
   const getMenu = async () => {
-    const allDocs = await getDocs(menuRef);
+    const allDocs = await getDocs(menuRef.current);
     const unsortedMenu = allDocs.docs.map((doc) => ({
       ...doc.data(),
-      id: doc.id,
     }));
-    setMenuData(unsortedMenu.sort((a, b) => a.id - b.id));
+    // allDocs.docs.map((doc) => console.log(doc.data()));
+    return unsortedMenu.sort((a, b) => a.id - b.id);
+    // console.log(menuData[0]);
   };
   useEffect(() => {
     console.log("menu rendered");
-    getMenu();
-  }, []);
+    getMenu().then((data) => {
+      setMenuData([...data]);
+      console.log(menuData);
+    });
+  }, [menuRef]);
 
   const contextvalue = {
     menuData,
@@ -68,6 +104,8 @@ export function MenuContextProvider({ user, setUser, children }) {
     setNoteRender,
     getMenu,
     addMenuItem,
+    deleteMenuItem,
+    menuRef,
   };
   return (
     <menuContext.Provider value={contextvalue}>{children}</menuContext.Provider>

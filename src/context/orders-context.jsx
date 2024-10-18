@@ -15,7 +15,7 @@ export function OrderContextProvider({ user, setUser, children }) {
   const [isOrderLoading, setIsOrderLoading] = useState(false);
   const [noteValue, setNoteValue] = useState(null);
   const [status, setStatus] = useState("");
-  const ordersRef = collection(db, user.ordersCollectionId || "Menu");
+  const ordersRef = collection(db, user?.ordersCollectionId || "Menu");
 
   const { cartItems, setCartItems, getDefaultCart } = useContext(menuContext);
   const [orders, setOrders] = useState(null);
@@ -38,7 +38,7 @@ export function OrderContextProvider({ user, setUser, children }) {
     // When you call onSnapshot, it returns an unsubscribe function that you can use to stop listening to changes.
     if (!user) return;
     const unsubscribe = onSnapshot(
-      collection(db, user.ordersCollectionId || "orders"),
+      collection(db, user?.ordersCollectionId || "orders"),
       (snapshot) => {
         const updatedOrders = snapshot.docs.map((doc) => ({
           ...doc.data(),
@@ -82,12 +82,6 @@ export function OrderContextProvider({ user, setUser, children }) {
     return temp;
   };
 
-  const postOrder = async (order) => {
-    const docRef = doc(db, "Current Orders", orderNum.toString());
-    await setDoc(docRef, order);
-    playSound();
-  };
-
   const updateOrderStatus = async (orderNum, newStatus) => {
     const statusRef = doc(db, "Current Orders", orderNum);
     await updateDoc(statusRef, { status: newStatus });
@@ -97,6 +91,12 @@ export function OrderContextProvider({ user, setUser, children }) {
     await deleteDoc(doc(db, "Current Orders", ordernum)).then(() =>
       console.log("deleted")
     );
+  };
+
+  const postOrder = async (order) => {
+    const docRef = doc(db, "Current Orders", orderNum.toString());
+    await setDoc(docRef, order);
+    playSound();
   };
 
   useEffect(() => console.log("orders rendered"), []);
