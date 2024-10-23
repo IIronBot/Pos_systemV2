@@ -75,6 +75,8 @@ export function MenuContextProvider({ user, setUser, children }) {
   };
 
   const getMenu = async () => {
+    menuRef.current = collection(db, user?.menuCollectionId);
+
     const allDocs = await getDocs(menuRef.current);
     const unsortedMenu = allDocs.docs.map((doc) => ({
       ...doc.data(),
@@ -87,7 +89,6 @@ export function MenuContextProvider({ user, setUser, children }) {
     console.log("menu rendered");
     getMenu().then((data) => {
       setMenuData([...data]);
-      console.log(menuData);
     });
   }, [menuRef]);
 

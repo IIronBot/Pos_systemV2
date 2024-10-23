@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useState, useRef } from "react";
 import { orderContext, menuContext, loginContext } from "./exportContext";
 import ordersound from "../assets/ordersound.mp3";
 
@@ -15,22 +15,25 @@ export function OrderContextProvider({ user, setUser, children }) {
   const [isOrderLoading, setIsOrderLoading] = useState(false);
   const [noteValue, setNoteValue] = useState(null);
   const [status, setStatus] = useState("");
-  const ordersRef = collection(db, user?.ordersCollectionId || "Menu");
+  const ordersRef = useRef(
+    collection(db, user?.ordersCollectionId || "Current Orders")
+  );
 
   const { cartItems, setCartItems, getDefaultCart } = useContext(menuContext);
   const [orders, setOrders] = useState(null);
 
   const fetchOrders = async () => {
-    const orderDocs = await getDocs(ordersRef);
+    console.log("SOME SOME");
+    ordersRef.current = collection(db, user?.ordersCollectionId);
+    const orderDocs = await getDocs(ordersRef.current);
     const unsortedOrders = orderDocs.docs.map((doc) => ({
       ...doc.data(),
-      id: doc.id,
     }));
-    setOrders(unsortedOrders.sort((a, b) => a.ordernum - b.ordernum));
+    console.log("Unsorted orders: " + unsortedOrders);
+    return unsortedOrders.sort((a, b) => a.ordernum - b.ordernum);
     // if (!orderNum) {
     //   setOrderNum(orderDocs.docs.length + 1);
     // }
-    console.log("orderdocslength: " + orderDocs.docs.length);
   };
 
   //listen for changes to data when context mounts
@@ -38,7 +41,7 @@ export function OrderContextProvider({ user, setUser, children }) {
     // When you call onSnapshot, it returns an unsubscribe function that you can use to stop listening to changes.
     if (!user) return;
     const unsubscribe = onSnapshot(
-      collection(db, user?.ordersCollectionId || "orders"),
+      collection(db, user?.ordersCollectionId || "Current Orders"),
       (snapshot) => {
         const updatedOrders = snapshot.docs.map((doc) => ({
           ...doc.data(),
@@ -67,6 +70,8 @@ export function OrderContextProvider({ user, setUser, children }) {
     }
 
     orderedItems.map((item) => {
+      console.log("item");
+
       idList += `${cartItems[item.id]}:${data[item.id].id},`;
     });
 
@@ -83,7 +88,11 @@ export function OrderContextProvider({ user, setUser, children }) {
   };
 
   const updateOrderStatus = async (orderNum, newStatus) => {
-    const statusRef = doc(db, "Current Orders", orderNum);
+    const statusRef = doc(
+      db,
+      user?.ordersCollectionId || "Current Orders",
+      orderNum || 0
+    );
     await updateDoc(statusRef, { status: newStatus });
   };
 
@@ -116,6 +125,7 @@ export function OrderContextProvider({ user, setUser, children }) {
     status,
     setStatus,
     deleteOrder,
+    ordersRef,
   };
   return (
     <orderContext.Provider value={contextValue}>

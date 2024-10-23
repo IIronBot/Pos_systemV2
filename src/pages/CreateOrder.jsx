@@ -24,7 +24,8 @@ export const CreateOrder = () => {
 
   let menuItemList = [];
   useEffect(() => {
-    // console.dir(getMenu())
+    console.log("MANMAN");
+    console.log(menuData);
     if (!menuData) return;
     for (let i = 0; i < menuData.length; i++) {
       if (menuData[i]) {
@@ -45,6 +46,8 @@ export const CreateOrder = () => {
   }, [menuData, filter]);
 
   useEffect(() => {
+    console.log("Money Money");
+    console.log(menuData);
     setOrderNum(orders[orders.length - 1].ordernum + 1);
     setFilter("all");
   }, []);
